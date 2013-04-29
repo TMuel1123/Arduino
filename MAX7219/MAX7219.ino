@@ -2,9 +2,17 @@
 
 MAX7219
 
+The datasheet for the MAX7219 can be found here:
+http://datasheets.maximintegrated.com/en/ds/MAX7219-MAX7221.pdf
+
 Arduino - MAX7219
 
+5V      - Pin 19
+GND     - Pin 4 + Pin 9
 
+Pin 10  - Pin 12 (LOAD /CS)
+Pin 11  - Pin  1 (DIN)
+Pin 13  - Pin 13 (CLK)
 
 
 */
@@ -13,6 +21,8 @@ Arduino - MAX7219
 const int CS_pin = 10; // Pin for chip select
 
 //MAX7219/MAX7221's memory register addresses:
+// See Table 2 on page 7 in the Datasheet
+
 const byte NoOp        = 0x00;
 const byte Digit0      = 0x01;
 const byte Digit1      = 0x02;
@@ -31,6 +41,8 @@ const byte DisplayTest = 0x0F;
 
 void setup()
 {
+  // The MAX7219 has officially no SPI / Microwire support like the MAX7221 but the
+  // serial interface is more or less the same like a SPI connection
   SPI.begin();
 
   // initalize chip select pins:
