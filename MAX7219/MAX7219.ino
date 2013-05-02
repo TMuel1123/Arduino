@@ -22,7 +22,6 @@ const byte numOfDevices = 2; // Enter the number of devices
 
 //MAX7219/MAX7221's memory register addresses:
 // See Table 2 on page 7 in the Datasheet
-
 const byte NoOp        = 0x00;
 const byte Digit0      = 0x01;
 const byte Digit1      = 0x02;
@@ -37,6 +36,7 @@ const byte Intensity   = 0x0A;
 const byte ScanLimit   = 0x0B;
 const byte ShutDown    = 0x0C;
 const byte DisplayTest = 0x0F;
+
 
 void SetShutDown(byte Mode) { SetData(ShutDown, !Mode); }
 void SetScanLimit(byte Digits) { SetData(ScanLimit, Digits); }
@@ -74,20 +74,22 @@ void setup()
   // serial interface is more or less the same like a SPI connection
   SPI.begin();
 
-  // initalize chip select pins:
+  // Initalize chip select pins:
   pinMode(CS_pin, OUTPUT);
   
-  // disable the decode mode because at the moment i dont use 7-Segment displays
+  // Disable the decode mode because at the moment i dont use 7-Segment displays
   SetDecodeMode(false);
-  // set the number of digits; start to count at 0
+  // Set the number of digits; start to count at 0
   SetScanLimit(7);
-  SetIntensity(0x05);
+  // Set the intensity between 0 and 15. Attention 0 is not off!
+  SetIntensity(5);
+  // Disable shutdown mode
   SetShutDown(false);
 }
 
 void loop()
 {
-  
+  // Write some patterns
   SetData(Digit0, 0b10000000, 1);
   SetData(Digit1, 0b01000000, 1);
   SetData(Digit2, 0b00100000, 1);
@@ -108,6 +110,7 @@ void loop()
   
   delay(1000);
   
+  //you may know this from space invaders
   unsigned int rowBuffer[]=
   {
     0b0010000010000000,
@@ -126,7 +129,11 @@ void loop()
     {
       for (byte rowCounter = 0; 7 >= rowCounter; rowCounter++)
       {
+        // roll the 16bits...
+        // The information how to roll is from http://arduino.cc/forum/index.php?topic=124188.0 
         rowBuffer[rowCounter] = ((rowBuffer[rowCounter] & 0x8000)?0x01:0x00) | (rowBuffer[rowCounter] << 1);
+        
+        // ...and then write them to the two devices
         SetData(rowCounter+1, byte(rowBuffer[rowCounter]), 1);
         SetData(rowCounter+1, byte(rowBuffer[rowCounter]>>8), 2);
       }    
