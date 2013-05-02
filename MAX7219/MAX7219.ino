@@ -14,11 +14,11 @@ Pin 10  - Pin 12 (LOAD /CS)
 Pin 11  - Pin  1 (DIN)
 Pin 13  - Pin 13 (CLK)
 
-
 */
 #include <SPI.h>
 
-const int CS_pin = 10; // Pin for chip select
+const int  CS_pin = 10;      // Pin for chip select
+const byte numOfDevices = 2; // Enter the number of devices
 
 //MAX7219/MAX7221's memory register addresses:
 // See Table 2 on page 7 in the Datasheet
@@ -38,6 +38,35 @@ const byte ScanLimit   = 0x0B;
 const byte ShutDown    = 0x0C;
 const byte DisplayTest = 0x0F;
 
+void SetShutDown(byte Mode) { SetData(ShutDown, !Mode); }
+void SetScanLimit(byte Digits) { SetData(ScanLimit, Digits); }
+void SetIntensity(byte intense) { SetData(Intensity, intense); }
+void SetDecodeMode(byte Mode) { SetData(DecodeMode, Mode); }
+
+// Writes the same data to all devices
+void SetData(byte adr, byte data) { SetData(adr, data, 255); } // write to all devices (255 = Broadcast) 
+
+// Writes data to the selected device or does broadcast if device number is 255
+void SetData(byte adr, byte data, byte device)
+{
+  digitalWrite(CS_pin, LOW);
+  // Count from top to bottom because first data which is sent is for the last device in the chain
+  for (byte i = numOfDevices; i > 0; i--)
+  {
+    if ((i == device) || (device == 255))
+    {
+      SPI.transfer(adr);
+      SPI.transfer(data);
+    }
+    else // if its not the selected device send the noop command
+    {
+      SPI.transfer(NoOp);
+      SPI.transfer(0);
+    }
+  }
+  digitalWrite(CS_pin, HIGH);
+  delay(1);
+}
 
 void setup()
 {
@@ -48,29 +77,37 @@ void setup()
   // initalize chip select pins:
   pinMode(CS_pin, OUTPUT);
   
-  SetDecodeMode(0);
+  // disable the decode mode because at the moment i dont use 7-Segment displays
+  SetDecodeMode(false);
+  // set the number of digits; start to count at 0
   SetScanLimit(7);
   SetIntensity(0x05);
   SetShutDown(false);
 }
 
-void SetShutDown(byte Mode) { SetData(ShutDown, !Mode); }
-void SetScanLimit(byte Digits) { SetData(ScanLimit, Digits); }
-void SetIntensity(byte intense) { SetData(Intensity, intense); }
-void SetDecodeMode(byte Mode) { SetData(DecodeMode, Mode); }
-
-void SetData(byte adr, byte data)
-{
-  digitalWrite(CS_pin, LOW);
-  SPI.transfer(adr);
-  SPI.transfer(data);
-  digitalWrite(CS_pin, HIGH);
-  delay(1);
-}
-
 void loop()
 {
+  
+  SetData(Digit0, 0b10000000, 1);
+  SetData(Digit1, 0b01000000, 1);
+  SetData(Digit2, 0b00100000, 1);
+  SetData(Digit3, 0b00010000, 1);
+  SetData(Digit4, 0b00001000, 1);
+  SetData(Digit5, 0b00000100, 1);
+  SetData(Digit6, 0b00000010, 1);
+  SetData(Digit7, 0b00000001, 1);
 
+  SetData(Digit0, 0b00000001, 2);
+  SetData(Digit1, 0b00000010, 2);
+  SetData(Digit2, 0b00000100, 2);
+  SetData(Digit3, 0b00001000, 2);
+  SetData(Digit4, 0b00010000, 2);
+  SetData(Digit5, 0b00100000, 2);
+  SetData(Digit6, 0b01000000, 2);
+  SetData(Digit7, 0b10000000, 2);
+  
+  delay(1000);
+  
   unsigned int rowBuffer[]=
   {
     0b0010000010000000,
@@ -90,9 +127,10 @@ void loop()
       for (byte rowCounter = 0; 7 >= rowCounter; rowCounter++)
       {
         rowBuffer[rowCounter] = ((rowBuffer[rowCounter] & 0x8000)?0x01:0x00) | (rowBuffer[rowCounter] << 1);
-        SetData(rowCounter+1, byte(rowBuffer[rowCounter]));
+        SetData(rowCounter+1, byte(rowBuffer[rowCounter]), 1);
+        SetData(rowCounter+1, byte(rowBuffer[rowCounter]>>8), 2);
       }    
-      delay(180);
+      delay(100);
     }
   }
 }
