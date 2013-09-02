@@ -1,8 +1,7 @@
-
 // Do not use vallues above 255
 #define SAMPLECOUNT 255
 
-byte startButton =  7; // Pull Pin 10 to GND to start conversion
+byte startButton =  7; // Pull Pin 7 to GND to start conversion
 byte sampleLED   = 13; // LED is on while the waveform is sampled
 byte printLED    = 11; // Optional LED; Is on as long as the data is written to the serial output
 byte sampleInput = A0; // Analog input 
