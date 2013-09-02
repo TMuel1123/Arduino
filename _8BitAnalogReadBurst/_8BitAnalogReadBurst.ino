@@ -29,7 +29,7 @@ void loop()
   
   Serial.println("");
   
-  while(digitalRead(10)); // Wait here for button press
+  while(digitalRead(startButton)); // Wait here for button press
   
   recordWave();
   printResult();
