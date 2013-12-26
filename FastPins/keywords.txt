@@ -1,0 +1,56 @@
+#######################################
+# Syntax Coloring Map For Ultrasound
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+#keyWord1	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+digitalFastWrite	KEYWORD2
+digitalFastRead	KEYWORD2
+
+#######################################
+# Setup and loop Functions (KEYWORD3)
+#######################################
+
+#keyWord3	KEYWORD3
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+HIGH	LITERAL1	Constants
+LOW	LITERAL1	Constants 
+TRUE	LITERAL1
+FALSE	LITERAL1
+
+PA	LITERAL1
+PB	LITERAL1
+PC	LITERAL1
+PD	LITERAL1
+PE	LITERAL1
+PF	LITERAL1
+PG	LITERAL1
+PH	LITERAL1
+PI	LITERAL1
+PJ	LITERAL1
+PK	LITERAL1
+PL	LITERAL1
+
+PORTA	LITERAL1
+PORTB	LITERAL1
+PORTC	LITERAL1
+PORTD	LITERAL1
+PORTE	LITERAL1
+PORTF	LITERAL1
+PORTG	LITERAL1
+PORTH	LITERAL1
+PORTI	LITERAL1
+PORTJ	LITERAL1
+PORTK	LITERAL1
+PORTL	LITERAL1
