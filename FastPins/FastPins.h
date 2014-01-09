@@ -5,14 +5,14 @@
  * 
  * Some macro definitions for faster pin access of the Arduino
  * 
- * The only drawback is that the easy pin assignment of the Arduino can not be
- * used for this. 
  */
 
 
 /******************************************************************************
 ***   Include                                                               ***
 ******************************************************************************/
+
+#include <avr/io.h>
 
 #if(ARDUINO >= 100)
  #include <Arduino.h>
@@ -49,14 +49,22 @@
  * 
  * This macro provdies a much faster acces to the arduino output pins.
  * 
+ * The price for the faster pin access are the following drawbacks:
+ *  * The easy pin assignment fron the arduino is not possible. Now PORT and PIN must be known
+ *  * Different Arduinos (UNO, MEGA, LEONARDO...) have different pin assignments: PIN13 (LED) is PORTB Pin5 on the UNO, PORTB Pin7 on the MEGA and PORTC Pin7 on the Leonardo
+ *  * Usage makes the Arduino sketch fixed to one board due to different pin assignment
+ *  * If a pin is configured as input the internal pullup resitor will be activated
+ * 
  * Usage:
  * digitalFastWrite(Port,Pin number, Output H/L);
- * digitalFastWrite(PORTB, 5, 1); // Sets the PIN 13 (LED) to a high level
- * digitalFastWrite(PORTB, 5, 3, 1); // Sets the PIN 13 (LED) and PIN11 to a high level
+ * digitalFastWrite(PC, 150);  // Sets the complete PORTC to 214 which is 0b10010110
+ * digitalFastWrite(PB, 5, 1); // Sets the pin number 5 of PORTB true which is PIN13 (LED) on an Arduino UNO
+ * digitalFastWrite(PB, 5, 3, 1); // Sets the PIN13 (LED) and PIN11 to a high level
  */
 
 #define GET_MACRO(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,NAME,...) NAME
-#define digitalFastWrite(...) GET_MACRO(__VA_ARGS__, digitalFastWrite8, digitalFastWrite7, digitalFastWrite6, digitalFastWrite5, digitalFastWrite4, digitalFastWrite3, digitalFastWrite2, digitalFastWrite1, digitalFastWrite_Not_enough_arguments)(__VA_ARGS__)
+#define digitalFastWrite(...) GET_MACRO(__VA_ARGS__, digitalFastWrite8, digitalFastWrite7, digitalFastWrite6, digitalFastWrite5, digitalFastWrite4, digitalFastWrite3, digitalFastWrite2, digitalFastWrite1, digitalFastWritePort)(__VA_ARGS__)
+#define digitalFastWritePort(_port, _value)  (_port = _value)
 #define digitalFastWrite1(_port, _pin1, _level)  (_level ? (_port |= (1<<_pin1)) : (_port &= ~(1<<_pin1)))
 #define digitalFastWrite2(_port, _pin1, _pin2, _level)  (_level ? (_port |= ((1<<_pin1)|(1<<_pin2))) : (_port &= ~((1<<_pin1)|(1<<_pin2))))
 #define digitalFastWrite3(_port, _pin1, _pin2, _pin3, _level)  (_level ? (_port |= ((1<<_pin1)|(1<<_pin2)|(1<<_pin3))) : (_port &= ~((1<<_pin1)|(1<<_pin2)|(1<<_pin3))))
