@@ -3,7 +3,7 @@
  * Author: Thomas Müller
  * Copyright 2013 Thomas Müller <tmuel1123 at gmail.com>
  * 
- * Some macro definitions for faster pin access of the Arduino
+ * Some macro definitions and functions for faster pin access of the Arduino
  * 
  */
 
@@ -93,7 +93,41 @@
  * If readed from the address of PORTx the status of the internal pullup resistors is read which could be different form the real input state
  * 
  * Usage:
- * byte myVariable = digitalFastRead(PINC, 2); // Reads Pin 2 from PORTC and writes the result into the mariable myVariable
+ * byte myVariable = digitalFastRead(PINC, 2); // Reads Pin 2 from PORTC and writes the result into the variable myVariable
  */
 
 #define digitalFastRead(_port, _pin) ((_port) & (1<<_pin) ? (1) : (0))
+
+/******************************************************************************
+***   Functions                                                             ***
+******************************************************************************/
+
+/*
+ * shiftFastOut
+ * 
+ * This function replaces the original shiftOut function from Arduino it is aproximately 6 times faster than the original.
+ * Execution time shiftOut      126uS
+ * Execution time shiftFastOut   20uS
+ *
+ * The price for the faster function are the following drawbacks:
+ *  * The easy pin assignment from the Arduino is not possible. Now PORT and PIN must be known
+ *  * Different Arduinos (UNO, MEGA, LEONARDO...) have different pin assignments: PIN13 (LED) is PORTB Pin5 on the UNO, PORTB Pin7 on the MEGA and PORTC Pin7 on the Leonardo
+ *  * Usage makes the Arduino sketch fixed to one board due to different pin assignment
+ *  * The port must be given as a pointer to the function
+ *  * The data and the clock pin must be on the same port
+ * 
+ * Usage:
+ * void shiftFastOut(pointerToPort, dataPin, clockPin, MSBFIRST, value) // 
+ *
+ * Example:
+ * shiftFastOut(&PORTB, 3, 5, MSBFIRST, 'A'); // Shifts out the value of 'A' (0x41) on PORTB with pin 3 for data and pin 5 for clock. The MSB is sent first.
+ */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void shiftFastOut(volatile uint8_t *port, uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t value);
+
+#ifdef __cplusplus
+}
+#endif

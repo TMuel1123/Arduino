@@ -1,5 +1,5 @@
 #######################################
-# Syntax Coloring Map For Ultrasound
+# Syntax Coloring Map For FastPins
 #######################################
 
 #######################################
@@ -14,6 +14,7 @@
 
 digitalFastWrite	KEYWORD2
 digitalFastRead	KEYWORD2
+shiftFastOut	KEYWORD2
 
 #######################################
 # Setup and loop Functions (KEYWORD3)
